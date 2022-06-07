@@ -24,14 +24,9 @@ public class UserService implements UserDetailsService {
         return new CustomUserDetails(principal);
     }
 
-    public User insert(User user) {
+    public User insertNonExistent(User user) {
         Optional<User> optionalUser = userRepository.findByUsername(user.getUsername());
-
-        if (optionalUser.isEmpty()) {
-            return userRepository.save(user);
-        } else {
-            return user;
-        }
+        return optionalUser.isEmpty() ? userRepository.save(user) : user;
     }
 
 }

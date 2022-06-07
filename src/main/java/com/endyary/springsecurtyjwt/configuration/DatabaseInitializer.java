@@ -41,7 +41,7 @@ public class DatabaseInitializer implements ApplicationListener<ApplicationReady
             user.setFullName(fullNames.get(i));
             user.setRoles(Set.of(roles.get(i)));
 
-            userService.insert(user);
+            userService.insertNonExistent(user);
         }
     }
 
