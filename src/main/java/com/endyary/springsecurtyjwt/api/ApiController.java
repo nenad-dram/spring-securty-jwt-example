@@ -1,5 +1,6 @@
 package com.endyary.springsecurtyjwt.api;
 
+import com.endyary.springsecurtyjwt.configuration.JWTUtil;
 import com.endyary.springsecurtyjwt.user.CustomUserDetails;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,8 +17,11 @@ public class ApiController {
 
     private final AuthenticationManager authManager;
 
-    public ApiController(AuthenticationManager authManager) {
+    private final JWTUtil jwtUtil;
+
+    public ApiController(AuthenticationManager authManager, JWTUtil jwtUtil) {
         this.authManager = authManager;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/public/hello")
@@ -52,5 +56,22 @@ public class ApiController {
         }
 
         return String.format("Hello %s!", principal.getUser().getFullName());
+    }
+
+    @PostMapping("/public/loginjwt")
+    public String loginJwt(@RequestBody JsonNode payload) {
+        String username = payload.get("username").asText();
+        String password = payload.get("password").asText();
+
+        try {
+            UsernamePasswordAuthenticationToken authInputToken =
+                    new UsernamePasswordAuthenticationToken(username, password);
+
+            authManager.authenticate(authInputToken);
+
+            return jwtUtil.generateToken(username);
+        } catch (AuthenticationException authExc) {
+            return "Invalid username or password!";
+        }
     }
 }
