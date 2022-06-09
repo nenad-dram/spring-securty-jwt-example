@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,17 +16,28 @@ public class JWTUtil {
     @Value("${jwt_secret}")
     private String secret;
 
+    // Token valid for 6h
+    public static final long JWT_TOKEN_VALIDITY = 6 * 60 * 60;
+
     public String generateToken(String username) throws IllegalArgumentException, JWTCreationException {
         return JWT.create()
                 .withSubject(username)
                 .withIssuedAt(new Date())
                 .withIssuer("JTW_EXAMPLE")
+                .withExpiresAt(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .sign(Algorithm.HMAC256(secret));
     }
 
-    public String validateTokenAndGetSubject(String token) throws JWTVerificationException {
-        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret)).build();
-        DecodedJWT jwt = verifier.verify(token);
-        return jwt.getSubject();
+    public void validateToken(String token) {
+        try {
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret)).build();
+            verifier.verify(token);
+        } catch (JWTVerificationException exc) {
+            throw new JWTVerificationException("Invalid JWT token!");
+        }
+    }
+
+    public String getSubject(String token) {
+        return JWT.decode(token).getSubject();
     }
 }
