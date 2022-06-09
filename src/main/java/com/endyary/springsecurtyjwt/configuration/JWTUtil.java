@@ -17,7 +17,7 @@ public class JWTUtil {
     private String secret;
 
     // Token valid for 6h
-    public static final long JWT_TOKEN_VALIDITY = 6 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY = 10;
 
     public String generateToken(String username) throws IllegalArgumentException, JWTCreationException {
         return JWT.create()

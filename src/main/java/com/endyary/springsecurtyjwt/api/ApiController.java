@@ -4,7 +4,6 @@ import com.endyary.springsecurtyjwt.user.AuthService;
 import com.endyary.springsecurtyjwt.user.CustomUserDetails;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,12 +39,9 @@ public class ApiController {
         String password = payload.get("password").asText();
 
         CustomUserDetails principal;
-        try {
-            Authentication authentication = authService.doAuth(username, password);
-            principal = (CustomUserDetails) authentication.getPrincipal();
-        } catch (AuthenticationException authExc) {
-            return "Invalid username or password!";
-        }
+        Authentication authentication = authService.doAuth(username, password);
+        principal = (CustomUserDetails) authentication.getPrincipal();
+
         return String.format("Hello %s!", principal.getUser().getFullName());
     }
 
@@ -54,11 +50,7 @@ public class ApiController {
         String username = payload.get("username").asText();
         String password = payload.get("password").asText();
 
-        try {
-            authService.doAuth(username, password);
-            return authService.generateToken(username);
-        } catch (AuthenticationException authExc) {
-            return "Invalid username or password!";
-        }
+        authService.doAuth(username, password);
+        return authService.generateToken(username);
     }
 }
