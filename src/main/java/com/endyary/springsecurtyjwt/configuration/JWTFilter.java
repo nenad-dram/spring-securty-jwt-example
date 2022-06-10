@@ -1,5 +1,6 @@
 package com.endyary.springsecurtyjwt.configuration;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.endyary.springsecurtyjwt.user.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,7 +39,8 @@ public class JWTFilter extends OncePerRequestFilter {
             try {
                 String jwt = authHeader.substring(7);
 
-                jwtUtil.validateToken(jwt);
+                if (!jwtUtil.isTokenValid(jwt) || jwtUtil.isTokenBlacklisted(jwt))
+                    throw new JWTVerificationException("Invalid JWT token!");
 
                 UserDetails userDetails = userService.loadUserByUsername(jwtUtil.getSubject(jwt));
                 UsernamePasswordAuthenticationToken authToken =

@@ -6,6 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class AuthService {
@@ -28,5 +29,11 @@ public class AuthService {
 
     public String generateToken(String username) {
         return jwtUtil.generateToken(username);
+    }
+
+    public void doLogout(String token) {
+        if (StringUtils.hasText(token)) {
+            jwtUtil.addToBlacklist(token);
+        }
     }
 }

@@ -3,11 +3,10 @@ package com.endyary.springsecurtyjwt.api;
 import com.endyary.springsecurtyjwt.user.AuthService;
 import com.endyary.springsecurtyjwt.user.CustomUserDetails;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ApiController {
@@ -52,5 +51,11 @@ public class ApiController {
 
         authService.doAuth(username, password);
         return authService.generateToken(username);
+    }
+
+    @GetMapping("/private/logout")
+    public ResponseEntity<Long> logout(@RequestHeader(name = "Authorization") String token) {
+        authService.doLogout(token.substring(7));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
