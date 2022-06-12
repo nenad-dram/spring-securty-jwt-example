@@ -24,6 +24,7 @@ public class AuthService {
         UsernamePasswordAuthenticationToken authInputToken =
                 new UsernamePasswordAuthenticationToken(username, password);
 
+        //AuthenticationManager will use the configured UserDetailsService bean to perform the auth
         return authManager.authenticate(authInputToken);
     }
 

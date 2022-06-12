@@ -36,10 +36,9 @@ public class ApiController {
     public String login(@RequestBody JsonNode payload) {
         String username = payload.get("username").asText();
         String password = payload.get("password").asText();
-
-        CustomUserDetails principal;
+        
         Authentication authentication = authService.doAuth(username, password);
-        principal = (CustomUserDetails) authentication.getPrincipal();
+        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
 
         return String.format("Hello %s!", principal.getUser().getFullName());
     }

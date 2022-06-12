@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Service layer for User data, and the implementation of UserDetailsService interface.
+ * <p>
+ * UserDetailsService's loadUserByUsername is used to get User from the DB,
+ * and its result (a UserDetails instance) is used later in the auth process
+ */
 @Service
 public class UserService implements UserDetailsService {
 

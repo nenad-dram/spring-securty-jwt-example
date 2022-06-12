@@ -14,6 +14,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Defines Spring's security configuration and required beans
+ */
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -28,30 +31,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // Set UserDetailsService that will be used for authentication
         auth.userDetailsService(userService);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .httpBasic()
+                .httpBasic()// Enable Basic Auth
                 .and()
-                .csrf().disable()
-                .cors()
+                .csrf().disable() // Disable CSRF
+                .cors() // Enable CORS
                 .and()
                 .authorizeRequests()
-                .antMatchers("/public/**").permitAll()
-                .antMatchers("/private/**").authenticated()
-                .antMatchers("/user/**").hasAuthority("USER")
-                .antMatchers("/admin/**").hasAuthority("ADMIN")
+                .antMatchers("/public/**").permitAll() // Allow without auth
+                .antMatchers("/private/**").authenticated() // Require authentication
+                .antMatchers("/user/**").hasAuthority("USER") // Require "USER" role
+                .antMatchers("/admin/**").hasAuthority("ADMIN") // Require "ADMIN" role
                 .and()
-                .exceptionHandling()
+                .exceptionHandling() // Exception handlers for Spring Security's exceptions
                 .authenticationEntryPoint(authenticationEntryPoint())
                 .accessDeniedHandler(accessDeniedHandler())
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS); // Disable sessions
 
+        // Set JWTFilter before UsernamePasswordAuthenticationFilter, i.e. it must be executed before
         http.addFilterBefore(jwfFilter, UsernamePasswordAuthenticationFilter.class);
     }
 

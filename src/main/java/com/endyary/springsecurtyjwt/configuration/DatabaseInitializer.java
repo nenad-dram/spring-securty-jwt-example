@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Inserts two users in the DB at the application startup
+ */
 @Component
 public class DatabaseInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
@@ -34,6 +37,7 @@ public class DatabaseInitializer implements ApplicationListener<ApplicationReady
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
+        
         for (int i = 0; i < usernames.size(); ++i) {
             User user = new User();
             user.setUsername(usernames.get(i));
