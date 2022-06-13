@@ -1,42 +1,37 @@
 package com.endyary.springsecurtyjwt.configuration;
 
-import com.endyary.springsecurtyjwt.user.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Defines Spring's security configuration and required beans
+ * Defines Spring security's configuration and required beans
  */
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private final UserService userService;
+public class SecurityConfig {
 
     private final JWTFilter jwfFilter;
 
-    public SecurityConfig(UserService userService, JWTFilter jwfFilter) {
-        this.userService = userService;
+    public SecurityConfig(JWTFilter jwfFilter) {
         this.jwfFilter = jwfFilter;
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // Set UserDetailsService that will be used for authentication
-        auth.userDetailsService(userService);
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic()// Enable Basic Auth
                 .and()
@@ -58,17 +53,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Set JWTFilter before UsernamePasswordAuthenticationFilter, i.e. it must be executed before
         http.addFilterBefore(jwfFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
     }
 
     @Bean
