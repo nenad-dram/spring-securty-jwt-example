@@ -1,5 +1,7 @@
 package com.endyary.springsecurtyjwt.user;
 
+import com.endyary.springsecurtyjwt.configuration.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +25,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
+    @Cacheable(cacheNames = CacheConfig.USER_CACHE, key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User principal = userRepository.findByUsername(username)
                 .orElseThrow(
